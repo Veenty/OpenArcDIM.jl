@@ -1,4 +1,6 @@
-export Poles, G, ∇G, ∇∇G, G_Evaluation, ∇G_Evaluation, ∇∇G_Evaluation, VandermontG, Vandermont∇G, Vandermont∇∇G
+export Poles, G, ∇G, ∇G, ∇G , ∇∇G
+export G_Evaluation, ∇G_Evaluation, ∇∇G_Evaluation
+export VandermontG, Vandermont∇Gn, Vandermontn∇G, Vandermont∇∇Gnn, Vandermontn∇∇Gn, Vandermontnn∇∇G
 
 struct Poles{T}
 
@@ -20,7 +22,7 @@ function Poles(Singularity, r, n)
     r_y = imag(r)
     n_x = real(n)
     n_y = imag(n)
-    return Poles{typeof(Singularity)}(Singularity_x, Singularity_y, r_x, r_y, n_x, n_y)
+    return Poles{typeof(r_x[1])}(Singularity_x, Singularity_y, r_x, r_y, n_x, n_y)
 end
 
 
@@ -176,6 +178,45 @@ function Vandermont∇G(X, Y, n, ωₗ, ωᵣ)
 
 end
 
+function Vandermont∇Gn(X, Y, n, ωₗ, ωᵣ)
+
+    V∇G = zeros(length(X.r), length(Y.r))
+
+    offset = (X.Singularity - Y.Singularity)* ( ! (X.Singularity ≈ Y.Singularity)  ) 
+    for j = 1:length(Y)
+        for i = 1:length(X)
+
+            Δr = (X.r[i] - Y.r[j]) + offset
+            V∇G[i,j] = ωₗ[i]*∇G(Δr, n[j])*ωᵣ[j]
+
+        end
+    end
+
+    return V∇G
+
+end
+function Vandermontn∇G(X, Y, n, ωₗ, ωᵣ)
+
+    V∇G = zeros(length(X.r), length(Y.r))
+
+    offset = (X.Singularity - Y.Singularity)* ( ! (X.Singularity ≈ Y.Singularity)  ) 
+    for j = 1:length(Y)
+        for i = 1:length(X)
+
+            Δr = (X.r[i] - Y.r[j]) + offset
+            V∇G[i,j] = ωₗ[i]*∇G(Δr, n[i])*ωᵣ[j]
+
+        end
+    end
+
+    return V∇G
+
+end
+
+
+
+
+
 function Vandermont∇∇G(X, Y, n₁, n₂, ωₗ, ωᵣ)
 
     V∇∇G = zeros(length(X.r), length(Y.r))
@@ -195,7 +236,63 @@ function Vandermont∇∇G(X, Y, n₁, n₂, ωₗ, ωᵣ)
 
 end
 
+function Vandermont∇∇Gnn(X, Y, n₁, n₂, ωₗ, ωᵣ)
 
+    V∇∇G = zeros(length(X.r), length(Y.r))
+
+    offset = (X.Singularity - Y.Singularity)* ( ! (X.Singularity ≈ Y.Singularity)  ) 
+
+    for j = 1:length(Y)
+        for i = 1:length(X)
+
+            Δr = (X.r[i] - Y.r[j]) + offset
+            V∇∇G[i,j] = ωₗ[i]*∇∇G(Δr, n₁[j], n₂[j])*ωᵣ[j]
+
+        end
+    end
+
+    return V∇∇G
+
+end
+
+
+function Vandermontn∇∇Gn(X, Y, n₁, n₂, ωₗ, ωᵣ)
+
+    V∇∇G = zeros(length(X.r), length(Y.r))
+
+    offset = (X.Singularity - Y.Singularity)* ( ! (X.Singularity ≈ Y.Singularity)  ) 
+
+    for j = 1:length(Y)
+        for i = 1:length(X)
+
+            Δr = (X.r[i] - Y.r[j]) + offset
+            V∇∇G[i,j] = ωₗ[i]*∇∇G(Δr, n₁[i], n₂[j])*ωᵣ[j]
+
+        end
+    end
+
+    return V∇∇G
+
+end
+
+function Vandermontnn∇∇G(X, Y, n₁, n₂, ωₗ, ωᵣ)
+
+    V∇∇G = zeros(length(X.r), length(Y.r))
+
+    offset = (X.Singularity - Y.Singularity)* ( ! (X.Singularity ≈ Y.Singularity)  ) 
+
+    for j = 1:length(Y)
+        for i = 1:length(X)
+
+            Δr = (X.r[i] - Y.r[j]) + offset
+            V∇∇G[i,j] = ωₗ[i]*∇∇G(Δr, n₁[i], n₂[i])*ωᵣ[j]
+
+        end
+    end
+
+    return V∇∇G
+
+end
 
 
 
